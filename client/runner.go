@@ -65,6 +65,11 @@ func NewPowerShellRunner() *Runner {
 }
 
 func (r *Runner) Execute(c *models.Check) *models.Execution {
+	logger := log.WithFields(log.Fields{
+		"check":    c.Name,
+		"executor": r.Executor,
+	})
+
 	ex := &models.Execution{
 		Scheduled: time.Now(),
 		Executed:  time.Now(),
@@ -76,14 +81,10 @@ func (r *Runner) Execute(c *models.Check) *models.Execution {
 	cmd := exec.Command(r.Executor, append(r.ExecutorArgs, c.Command)...)
 	cmd.Dir = os.ExpandEnv(r.Dir)
 
-	log.WithFields(log.Fields{
-		"check_name": c.Name,
-	}).Info("Running check")
-	log.WithFields(log.Fields{
-		"check":    c,
-		"executor": r.Executor,
-		"cmd":      strings.Join(append([]string{cmd.Path}, cmd.Args...), " "),
-	}).Debug("Running check command")
+	logger.Info("Running check")
+	logger.
+		WithField("cmd", strings.Join(append([]string{cmd.Path}, cmd.Args...), " ")).
+		Debug("Running check command")
 
 	out := bytes.NewBuffer([]byte{})
 	cmd.Stdout = out
@@ -95,11 +96,31 @@ func (r *Runner) Execute(c *models.Check) *models.Execution {
 		ex.Output = err.Error()
 		ex.Status = models.StatusCrit
 	} else {
+		d := c.Timeout
+		if d == 0 {
+			d = time.Minute
+		}
+
+		t := time.NewTimer(d)
+
 		select {
-		case <-time.After(c.Timeout):
+		case <-t.C:
 			ex.Output = fmt.Sprintf("%s\nTimeout Expired!", out.String())
 			ex.Status = models.StatusCrit
+			err := cmd.Process.Kill()
+			logger.
+				WithField("timeout", d).
+				Warn("Check execution timed out")
+
+			if err != nil {
+				logger.
+					WithError(err).
+					WithField("timeout", d).
+					Error("Failed to kill check process after timeout")
+			}
 		case err := <-r.waitForProcess(cmd):
+			t.Stop() // Reclaim the timer's handles
+
 			ex.Output = out.String()
 
 			if err != nil {
@@ -120,6 +141,10 @@ func (r *Runner) Execute(c *models.Check) *models.Execution {
 			} else {
 				ex.Status = models.StatusCrit
 			}
+
+			logger.
+				WithField("status", ex.Status.String()).
+				Debug("Check execution completed")
 		}
 	}
 
