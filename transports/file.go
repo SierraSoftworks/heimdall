@@ -27,7 +27,7 @@ func NewFileTransport(u *TransportURL) (*FileTransport, error) {
 		WithField("transport", u.SafeString()).
 		Debug("Opening file for transport")
 
-	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_SYNC, 0664)
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY|os.O_CREATE|os.O_SYNC, 0664)
 	if err != nil {
 		log.
 			WithField("path", path).
