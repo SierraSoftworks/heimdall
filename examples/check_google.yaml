@@ -1,0 +1,17 @@
+---
+checks:
+  - name: google_https
+    command: /bin/curl https://www.google.com
+    interval: 60s
+    timeout: 5s
+    aggregates:
+      - google
+      - https-checks
+
+  - name: google_http
+    command: /bin/curl http://www.google.com
+    interval: 60s
+    timeout: 5s
+    aggregates:
+      - google
+      - http-checks
