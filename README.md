@@ -1,4 +1,4 @@
-# Heimdall
+# Heimdall [![Build Status](https://travis-ci.org/SierraSoftworks/heimdall.svg?branch=master)](https://travis-ci.org/SierraSoftworks/heimdall)
 [Heimdall][] is a monitoring service built on some of the same design
 principles as other distributed monitoring tools like [Sensu][] but with
 a strong emphasis on security and performance.
