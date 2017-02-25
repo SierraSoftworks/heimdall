@@ -26,8 +26,8 @@ func TestMemoryStore(t *testing.T) {
 			Aggregates: []string{
 				"webservers",
 			},
-			Interval: models.Duration(60 * time.Second),
-			Timeout:  models.Duration(5 * time.Second),
+			Interval: 60 * time.Second,
+			Timeout:  5 * time.Second,
 		}
 
 		exec := &models.Execution{
