@@ -1,0 +1,6 @@
+---
+checks:
+    - name: check1
+      command: echo "Hello"
+      interval: 30s
+      timeout: 2s
