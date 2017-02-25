@@ -1,0 +1,4 @@
+---
+transports:
+  - driver: nats
+    url: nats://localhost:4222

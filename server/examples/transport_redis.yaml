@@ -1,0 +1,4 @@
+---
+transports:
+    - driver: redis
+      url: redis://localhost:6379/
