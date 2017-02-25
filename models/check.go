@@ -10,11 +10,11 @@ import (
 // Checks are uniquely identified by their name however they may
 // also be placed in aggregates for the purpose of analysis.
 type Check struct {
-	Name       string        `json:"name"`
-	Command    string        `json:"command"`
-	Interval   time.Duration `json:"interval"`
-	Timeout    time.Duration `json:"timeout"`
-	Aggregates []string      `json:"aggregates"`
+	Name       string   `json:"name"`
+	Command    string   `json:"command"`
+	Interval   Duration `json:"interval"`
+	Timeout    Duration `json:"timeout"`
+	Aggregates []string `json:"aggregates"`
 }
 
 // CheckDetails represents a check and a quick summary of its current
