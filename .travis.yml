@@ -4,7 +4,8 @@ services:
     - redis-server
 
 before_install:
-    - curl https://github.com/nats-io/gnatsd/releases/download/v0.9.6/gnatsd-v0.9.6-linux-amd64.zip | unzip
+    - curl https://github.com/nats-io/gnatsd/releases/download/v0.9.6/gnatsd-v0.9.6-linux-amd64.zip
+    - unzip gnatsd-v0.9.6-linux-amd64.zip
     - mv gnatsd-v0.9.6-linux-amd64 nats
     - chmod +x nats/gnatsd
 
