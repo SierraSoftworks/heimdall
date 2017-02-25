@@ -1,0 +1,253 @@
+FORMAT: 1A
+HOST: https://heimdall.sierrasoftworks.com/api/v1
+
+# Heimdall
+Heimdall is a monitoring tool build to deliver low latency, high availability
+monitoring of distributed systems with minimal configuration and management overhead.
+
+Its API provides you with a number of tools through which you can derive information
+about the state of your infrastructure, drive realtime dashboards and build reports.
+At its core, the API is designed present a view into Heimdall's datastructures while
+keeping complexity low.
+
+## Group Clients
+Methods for querying lists of, and information about, clients which have submitted check
+results to Heimdall recently.
+
+### Clients [/clients{?tag}]
+Heimdall tracks clients which have recently submitted check results and allows you to
+query this information. Clients which do not submit results for a configurable period
+of time are automatically purged.
+
++ Parameters
+    + tag: value (string, optional) - Any tags and the values you wish to filter your results with
+
+#### List Clients [GET]
++ Response 200 (application/json)
+    + Attributes (array[Client])
+
+### Client [/client/{client}]
+A client represents an individual entity that Heimdall is monitoring through a series
+of checks.
+
++ Parameters
+    + client: web001 (string, required) - The unique ID of the client you wish to retrieve
+
+#### Get Client [GET]
++ Response 200 (application/json)
+    + Attributes (Client Details)
+
++ Response 404 (application/json)
+    + Attributes (Error)
+
+#### Drop Client [DELETE]
++ Response 200 (application/json)
+    + Attributes (Client)
+
++ Response 404 (application/json)
+    + Attributes (Error)
+
+#### Client Checks [GET /client/{client}/checks]
++ Response 200 (application/json)
+    + Attributes (array[Check Details])
+
++ Response 404 (application/json)
+    + Attributes (Error)
+
+## Group Checks
+Methods for querying lists of, and information about, specific checks which are being
+executed by your clients.
+
+### Checks [/checks{?status}]
+Heimdall keeps track of the various checks executed by clients across your infrastructure
+to enable analysis of the health of specific services and resources.
+
++ Parameters
+    + status: CRIT (Status, optional) - Only return checks which have entries in the specified state
+
+#### List Checks [GET]
++ Response 200 (application/json)
+    + Attributes (array[Check])
+
+
+### Check [/check/{check}]
+A check represents a command that is executed on a server to determine the health of a
+service or resource.
+
++ Parameters
+    + check: apache-port80 (string, required) - The unique ID of the check you wish to retrieve
+
+#### Get Check [GET]
++ Response 200 (application/json)
+    + Attributes (Check Details)
+
++ Response 404 (application/json)
+    + Attributes (Error)
+
+#### Check Clients [GET /check/{check}/clients{?tag}]
+
++ Parameters
+    + tag: value (string, optional) - Any tags and the values you wish to filter your results with
+
++ Response 200 (application/json)
+    + Attributes (array[Client Details])
+
++ Response 404 (application/json)
+    + Attributes (Error)
+
+## Group Executions
+
+### Get Executions [GET /check/{check}/client/{client}/executions]
++ Parameters
+    + check: apache-port80 (string, required) - The unique ID of the check you wish to retrieve
+    + client: web001 (string, required) - The unique ID of the client which ran the check
+    
++ Response 200 (application/json)
+    + Attributes(array[Execution])
+
++ Response 404 (application/json)
+    + Attributes (Error)
+
+### Get Executions [GET /client/{client}/check/{check}/executions]
++ Parameters
+    + check: apache-port80 (string, required) - The unique ID of the check you wish to retrieve
+    + client: web001 (string, required) - The unique ID of the client which ran the check
+    
++ Response 200 (application/json)
+    + Attributes(array[Execution])
+
++ Response 404 (application/json)
+    + Attributes (Error)
+
+## Group Aggregates
+Methods for querying and managing user defined groups of checks based on logical, service level,
+availability.
+
+### Aggregates [/aggregates]
+Heimdall allows you to group multiple checks across multiple clients together into logical aggregates.
+These aggregates enable you to quickly identify and track the state of specific services and resources
+across your cluster while enabling check re-use.
+
+#### Aggregate List [GET]
++ Response 200 (application/json)
+    + Attributes (array[Aggregate])
+
++ Response 404 (application/json)
+    + Attributes (Error)
+
+### Aggregate [/aggregate/{aggregate}]
+An aggregate represents a collection and rollup of the results of multiple checks across multiple hosts.
+They enable you to quickly identify the health and/or availability of a service and can be considered a
+form of grouping.
+
++ Parameters
+    + aggregate: webservers (string, required) - The unique name of the aggregate
+
+#### Aggregate Details [GET]
++ Response 200 (application/json)
+    + Attributes (Aggregate Details)
+
++ Response 404 (application/json)
+    + Attributes (Error)
+
+#### Remove Aggregate [DELETE]
++ Response 200 (application/json)
+    + Attributes (Aggregate)
+
++ Response 404 (application/json)
+    + Attributes (Error)
+
+#### Aggregate Clients [GET /aggregate/{aggregate}/clients]
++ Response 200 (application/json)
+    + Attributes (array[Client Details])
+
++ Response 404 (application/json)
+    + Attributes (Error)
+
+#### Aggregate Checks [GET /aggregate/{aggregate}/checks]
++ Response 200 (application/json)
+    + Attributes (array[Check Details])
+
++ Response 404 (application/json)
+    + Attributes (Error)
+
+## Data Structures
+
+### Client (object)
+#### Properties
++ name: web001 (string, required) - The unique name of the client
++ tags (object, required) - The tags associated with this client
++ status: OK (State, required) - The status of this client based on its check execution
+
+### Client Details (Client)
+#### Properties
++ status: OK (State, required) - The current state of this client determined by the most recent execution of all of its checks
++ last_seen: 2017-02-14T00:00:00Z (string, required) - The last time that this client reported a status update
+
+### Check (object)
+A check is a task which will be executed by the Heimdall client to determine the availability
+of a service or resource.
+
+#### Properties
++ name: apache-port80 (string, required) - The unique name of this check
++ command: `curl -sS http://localhost:80/` (string, required) - The command used to execute this check
++ interval: 30000 (number, required) - The time between each invocation of this check
++ timeout: 5000 (number, required) - The execution time allowed before the check is considered failed
+
+### Check Details (Check)
+#### Properties
++ status: OK (State, required) - The current state of this check determined by the most recent execution.
++ executed: 2017-02-14T00:00:00Z (string, required) - The time at which this check was last executed
+
+### Execution (object)
+An execution provides you with the results of executing a specific check on a host. This includes the
+details of the host, check and any information related to the execution of that check.
+
+#### Properties
++ scheduled: 2017-02-14T00:00:00Z (string, required) - The time at which this check was scheduled for execution
++ executed: 2017-02-14T00:00:00Z (string, required) - The time at which this check was executed
++ duration: 1200 (number, required) - The time taken to execute this check's command
++ status: CRIT (State, required) - The status of this check's execution
++ output: HTTP/1.1 200 OK\r\n (string, required) - The combined output generated by the check command
+
+### Aggregate (object)
+An aggregate represents a logical grouping of checks across a range of hosts for the purpose
+of evaluating service or resource availability across your infrastructure.
+
+#### Properties
++ name: webservers (string, required) - The unique name of this aggregate
++ status: OK (State, required) - The status of this client based on its check execution
+
+### Aggregate Details (Aggregate)
+The details of an aggregate include the information about each check execution which comprises
+its dataset.
+
+#### Properties
++ entries (array[Aggregate Entry], required) - The various entries which make up this aggregate
+
+### Aggregate Entry (object)
+An aggregate entry gives you a lightweight overview of the state of a specific hosts' most recent
+check execution as part of this aggregate.
+
+#### Properties
++ check: apache-port80 (string, required) - The unique name of the check
++ client: web001 (string, required) - The unique name of the host which ran the check
++ executed: 2017-02-14T00:00:00Z (string, required) - The time at which this check was executed
++ status: CRIT (State, required) - The current state of this aggregate
+
+### State (enum[string])
++ CRIT - The check failed in a manner that indicates the service is completely unavailable.
++ WARN - The check failed in a manner indicating that the service is degraded.
++ OK - The check passed successfully.
++ UNKN - The check exited in an unexpected way.
+
+### Error (object)
+An error object is used by the API, in conjunction with a non-200 status code, to report a failure
+to process a request for some reason. To standardize the implementation of clients, the HTTP status
+code and message are both provided in the error object, alongside a human readable message explaining
+the reason for the failure to process the request.
+
+#### Properties
++ code (number, required) - The HTTP error code for this error type.
++ error (string, required) - The HTTP error name for this error type.
++ message (string, required) - A human readable description of this error.
