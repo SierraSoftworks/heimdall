@@ -7,28 +7,32 @@ import (
 
 	"bytes"
 
+	"github.com/SierraSoftworks/heimdall/handlers"
 	"github.com/SierraSoftworks/heimdall/models"
 	"github.com/SierraSoftworks/scheduler"
 	log "github.com/Sirupsen/logrus"
 )
 
 type Client struct {
-	Checks          []models.Check
-	scheduledChecks []*scheduler.ActiveTask
-	Runner          *Runner
-	Transports      []*ClientTransport
+	Config *Config
 
-	l                 sync.Mutex
-	reports           chan *models.Report
+	runner            *Runner
+	transports        []*ClientTransport
+	handlers          []handlers.Handler
+	scheduledChecks   []*scheduler.ActiveTask
 	keepaliveSchedule *scheduler.ActiveTask
+
+	l       sync.Mutex
+	reports chan *models.Report
 }
 
-func NewClient() *Client {
+func NewClient(conf *Config) *Client {
 	c := &Client{
-		Checks:     []models.Check{},
-		Runner:     NewDefaultRunner(),
-		Transports: []*ClientTransport{},
+		Config: conf,
 
+		runner:          NewDefaultRunner(),
+		transports:      []*ClientTransport{},
+		handlers:        []handlers.Handler{},
 		scheduledChecks: []*scheduler.ActiveTask{},
 		reports:         make(chan *models.Report),
 	}
@@ -56,7 +60,7 @@ func NewClient() *Client {
 
 	go func() {
 		for check := range c.reports {
-			for _, tr := range c.Transports {
+			for _, tr := range c.transports {
 				err := tr.PublishCheck(check)
 				if err != nil {
 					log.
@@ -81,13 +85,13 @@ func (c *Client) Reschedule() {
 	}
 
 	c.scheduledChecks = []*scheduler.ActiveTask{}
-	for _, check := range c.Checks {
+	for _, check := range c.Config.Checks {
 		func(check models.Check) {
 			schedule := scheduler.Do(func(t time.Time) error {
 				c.reports <- &models.Report{
 					Check:     &check,
 					Client:    config.Client,
-					Execution: c.Runner.ExecuteCheck(&check),
+					Execution: c.runner.ExecuteCheck(&check),
 				}
 
 				return nil
@@ -113,13 +117,13 @@ func (c *Client) Shutdown() {
 func (c *Client) Describe() string {
 	b := bytes.NewBuffer([]byte{})
 	b.WriteString("Transports:\n")
-	for _, t := range c.Transports {
+	for _, t := range c.transports {
 		b.WriteString(fmt.Sprintf("  - %s\n", t.Transport.Describe()))
 	}
 
 	b.WriteString("\n")
 	b.WriteString("Checks:\n")
-	for _, c := range c.Checks {
+	for _, c := range c.Config.Checks {
 		b.WriteString(fmt.Sprintf("  - %s (every %s)\n", c.Name, c.Interval))
 	}
 
