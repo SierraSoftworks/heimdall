@@ -87,7 +87,7 @@ func (c *Client) Reschedule() {
 				c.reports <- &models.Report{
 					Check:     &check,
 					Client:    config.Client,
-					Execution: c.Runner.Execute(&check),
+					Execution: c.Runner.ExecuteCheck(&check),
 				}
 
 				return nil
