@@ -12,6 +12,7 @@ type Config struct {
 	Client     *models.Client           `json:"client"`
 	Checks     []models.Check           `json:"checks"`
 	Transports []models.TransportConfig `json:"transports"`
+	Handlers   []models.Handler         `json:"handlers"`
 }
 
 func ReadConfig(path string) (*Config, error) {
