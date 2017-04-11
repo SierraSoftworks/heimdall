@@ -14,13 +14,13 @@ type Subscription interface {
 	Close() error
 }
 
-func GetTransport(driver string, url string) (Transport, error) {
+func GetTransport(url string) (Transport, error) {
 	u, err := ParseURL(url)
 	if err != nil {
 		return nil, err
 	}
 
-	switch driver {
+	switch u.Driver {
 	case "nats":
 		return NewNATSTransport(u)
 	case "redis":

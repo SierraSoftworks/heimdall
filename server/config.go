@@ -7,14 +7,14 @@ import (
 )
 
 type Config struct {
-	Transports []models.Transport `json:"transports"`
 	Listen     string             `json:"listen"`
+	Transports []models.Transport `json:"transports"`
 }
 
 func ReadConfig(path string) (*Config, error) {
 	c := &Config{
 		Listen:     ":80",
-		Transports: []models.TransportConfig{},
+		Transports: []models.Transport{},
 	}
 
 	cfiles, err := utils.FindConfig(path)

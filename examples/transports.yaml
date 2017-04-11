@@ -1,0 +1,10 @@
+---
+transports:
+  - name: redis
+    url: redis://user:pass@localhost:6379/0
+
+  - name: nats production
+    url: nats://user:pass@localhost:4222/heimdall?queue_group=prod
+
+  - name: nats development
+    url: nats://user:pass@localhost:4222/heimdall?queue_group=dev

@@ -1,6 +1,7 @@
 package stores
 
 import (
+	"sort"
 	"time"
 
 	"github.com/SierraSoftworks/heimdall/models"
@@ -104,6 +105,9 @@ func (s *Memory) updateExecs(r *models.Report, e *memoryExecState) {
 	} else {
 		es = append(es, *r.Execution)
 	}
+
+	sort.Sort(memoryOrderedCheckExecutions(es))
+
 	s.executions[memoryExecutionKey{r.Client.Name, r.Check.Name}] = es
 }
 
@@ -422,4 +426,18 @@ func (s *Memory) RemoveAggregate(name string) (*models.Aggregate, error) {
 
 	delete(s.aggregates, name)
 	return ad, nil
+}
+
+type memoryOrderedCheckExecutions []models.Execution
+
+func (m memoryOrderedCheckExecutions) Len() int {
+	return len(m)
+}
+
+func (m memoryOrderedCheckExecutions) Swap(i, j int) {
+	m[i], m[j] = m[j], m[i]
+}
+
+func (m memoryOrderedCheckExecutions) Less(i, j int) bool {
+	return m[i].Executed.Before(m[j].Executed)
 }

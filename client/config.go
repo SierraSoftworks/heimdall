@@ -9,8 +9,8 @@ import (
 )
 
 type Config struct {
-	Client     *models.Client           `json:"client"`
-	Checks     []models.Check           `json:"checks"`
+	Client     *models.Client     `json:"client"`
+	Checks     []models.Check     `json:"checks"`
 	Transports []models.Transport `json:"transports"`
 }
 

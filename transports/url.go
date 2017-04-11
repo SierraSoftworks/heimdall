@@ -8,7 +8,7 @@ import (
 )
 
 type TransportURL struct {
-	Protocol    string
+	Driver      string
 	User        string
 	Password    string
 	Host        string
@@ -41,7 +41,7 @@ func ParseURL(u string) (*TransportURL, error) {
 	}
 
 	return &TransportURL{
-		Protocol:    strings.TrimRight(p.Scheme, ":"),
+		Driver:      strings.TrimRight(p.Scheme, ":"),
 		User:        user,
 		Password:    pass,
 		Host:        p.Host,
@@ -65,7 +65,7 @@ func (u *TransportURL) GetOption(option, def string) string {
 }
 
 func (u *TransportURL) SafeString() string {
-	return strings.TrimRight(fmt.Sprintf("%s://%s/%s", u.Protocol, u.Host, u.TopicPrefix), "/")
+	return strings.TrimRight(fmt.Sprintf("%s://%s/%s", u.Driver, u.Host, u.TopicPrefix), "/")
 }
 
 func (u *TransportURL) String() string {

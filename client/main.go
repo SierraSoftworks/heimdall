@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"strings"
 	"syscall"
@@ -9,13 +8,10 @@ import (
 	"os/signal"
 
 	"github.com/SierraSoftworks/heimdall"
-	"github.com/SierraSoftworks/heimdall/transports"
 	log "github.com/Sirupsen/logrus"
 	"github.com/getsentry/raven-go"
 	"github.com/urfave/cli"
 )
-
-var config *Config
 
 func main() {
 	if envDSN := os.Getenv("SENTRY_DSN"); envDSN != "" {
@@ -68,44 +64,15 @@ func main() {
 			log.SetLevel(log.InfoLevel)
 		}
 
-		cfg, err := ReadConfig(c.GlobalString("config"))
-		if err != nil {
-			return err
-		}
-
-		config = cfg
-
 		return nil
 	}
 
 	app.Action = func(c *cli.Context) error {
-		client := NewClient()
-		client.Checks = config.Checks
-
-		for _, tc := range config.Transports {
-			t, err := transports.GetTransport(tc.Driver, tc.URL)
-			if err != nil {
-				log.
-					WithField("transport", tc).
-					WithError(err).
-					Error("Failed to connect to transport")
-				continue
-			}
-
-			ct := NewClientTransport(t)
-			client.Transports = append(client.Transports, ct)
-		}
-
-		if len(client.Transports) == 0 {
-			err := fmt.Errorf("no transports")
-			log.
-				WithError(err).
-				Error("No available transports")
-
+		client, err := NewClient(c.GlobalString("config"))
+		if err != nil {
+			log.WithError(err).Error()
 			return err
 		}
-
-		client.Reschedule()
 
 		// Wait for a kill/interrupt signal before exiting
 		quitSig := make(chan os.Signal, 1)
