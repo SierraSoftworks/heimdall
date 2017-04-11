@@ -11,7 +11,7 @@ import (
 type Config struct {
 	Client     *models.Client           `json:"client"`
 	Checks     []models.Check           `json:"checks"`
-	Transports []models.TransportConfig `json:"transports"`
+	Transports []models.Transport `json:"transports"`
 }
 
 func ReadConfig(path string) (*Config, error) {
@@ -25,7 +25,7 @@ func ReadConfig(path string) (*Config, error) {
 			Name: hostname,
 			Tags: map[string]string{},
 		},
-		Transports: []models.TransportConfig{},
+		Transports: []models.Transport{},
 		Checks:     []models.Check{},
 	}
 

@@ -7,8 +7,8 @@ import (
 )
 
 type Config struct {
-	Listen     string                   `json:"listen"`
-	Transports []models.TransportConfig `json:"transports"`
+	Transports []models.Transport `json:"transports"`
+	Listen     string             `json:"listen"`
 }
 
 func ReadConfig(path string) (*Config, error) {
