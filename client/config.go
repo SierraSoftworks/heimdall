@@ -9,10 +9,10 @@ import (
 )
 
 type Config struct {
-	Client     *models.Client           `json:"client"`
-	Checks     []models.Check           `json:"checks"`
-	Transports []models.TransportConfig `json:"transports"`
-	Handlers   []models.Handler         `json:"handlers"`
+	Client     *models.Client     `json:"client"`
+	Checks     []models.Check     `json:"checks"`
+	Transports []models.Transport `json:"transports"`
+	Handlers   []models.Handler   `json:"handlers"`
 }
 
 func ReadConfig(path string) (*Config, error) {
@@ -26,7 +26,7 @@ func ReadConfig(path string) (*Config, error) {
 			Name: hostname,
 			Tags: map[string]string{},
 		},
-		Transports: []models.TransportConfig{},
+		Transports: []models.Transport{},
 		Checks:     []models.Check{},
 	}
 
