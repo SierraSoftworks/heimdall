@@ -10,6 +10,6 @@ type Handler struct {
 	Name   string                 `json:"name"`
 	Filter map[string]interface{} `json:"filter"`
 
-	Type string `json:"type"`
-	URL  string `json:"url"`
+	Driver string `json:"driver"`
+	URL    string `json:"url"`
 }
