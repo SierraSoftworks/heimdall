@@ -1,6 +1,7 @@
 package transports
 
 import (
+	"net/url"
 	"os"
 	"testing"
 	"time"
@@ -15,7 +16,7 @@ func TestFileTransport(test *testing.T) {
 	Convey("FileTransport", test, func() {
 		os.Remove("file_test.dat")
 
-		u, err := ParseURL("file://file_test.dat")
+		u, err := url.Parse("file://file_test.dat")
 		So(err, ShouldBeNil)
 		So(u, ShouldNotBeNil)
 

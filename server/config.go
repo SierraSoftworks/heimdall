@@ -14,7 +14,7 @@ type Config struct {
 func ReadConfig(path string) (*Config, error) {
 	c := &Config{
 		Listen:     ":80",
-		Transports: []models.TransportConfig{},
+		Transports: []models.Transport{},
 	}
 
 	cfiles, err := utils.FindConfig(path)

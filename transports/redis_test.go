@@ -1,6 +1,7 @@
 package transports
 
 import (
+	"net/url"
 	"testing"
 	"time"
 
@@ -14,7 +15,7 @@ func TestRedisTransport(test *testing.T) {
 	defer log.SetLevel(log.ErrorLevel)
 
 	Convey("RedisTransport", test, func() {
-		u, err := ParseURL("redis://localhost:6379/heimdall")
+		u, err := url.Parse("redis://localhost:6379/heimdall")
 		So(err, ShouldBeNil)
 		So(u, ShouldNotBeNil)
 

@@ -2,6 +2,7 @@ package transports
 
 import (
 	"fmt"
+	"net/url"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/keimoon/gore"
@@ -9,19 +10,21 @@ import (
 
 type RedisTransport struct {
 	c   *gore.Conn
-	url *TransportURL
+	url *url.URL
 }
 
-func NewRedisTransport(u *TransportURL) (*RedisTransport, error) {
+func NewRedisTransport(u *url.URL) (*RedisTransport, error) {
 	c, err := gore.Dial(u.Host)
 	if err != nil {
 		return nil, err
 	}
 
-	if u.Password != "" {
-		err := c.Auth(u.Password)
-		if err != nil {
-			return nil, err
+	if u.User != nil {
+		if pass, ok := u.User.Password(); ok {
+			err := c.Auth(pass)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -32,7 +35,7 @@ func NewRedisTransport(u *TransportURL) (*RedisTransport, error) {
 }
 
 func (t *RedisTransport) Describe() string {
-	return t.url.SafeString()
+	return SafeURLString(t.url)
 }
 
 func (t *RedisTransport) Subscribe(topic string) (Subscription, error) {
@@ -55,16 +58,18 @@ func (t *RedisTransport) Subscribe(topic string) (Subscription, error) {
 		return nil, err
 	}
 
-	if t.url.Password != "" {
-		err := conn.Auth(t.url.Password)
-		if err != nil {
-			return nil, err
+	if t.url.User != nil {
+		if pass, ok := t.url.User.Password(); ok {
+			err := conn.Auth(pass)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
 	s := gore.NewSubscriptions(conn)
 
-	err = s.Subscribe(t.url.GetFullTopic(topic))
+	err = s.Subscribe(GetFullTopic(t.url, topic))
 	if err != nil {
 		log.
 			WithField("topic", topic).
@@ -118,7 +123,7 @@ func (t *RedisTransport) Publish(topic string, data []byte) error {
 		WithField("transport", t.Describe()).
 		Debug("Publishing message to transport")
 
-	return gore.Publish(t.c, t.url.GetFullTopic(topic), data)
+	return gore.Publish(t.c, GetFullTopic(t.url, topic), data)
 }
 
 func (t *RedisTransport) Close() error {

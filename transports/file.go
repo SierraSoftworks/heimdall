@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -17,21 +18,21 @@ import (
 
 type FileTransport struct {
 	f   *os.File
-	url *TransportURL
+	url *url.URL
 }
 
-func NewFileTransport(u *TransportURL) (*FileTransport, error) {
-	path := filepath.Join(append([]string{u.Host}, strings.Split(u.TopicPrefix, "/")...)...)
+func NewFileTransport(u *url.URL) (*FileTransport, error) {
+	path := filepath.Join(append([]string{u.Host}, strings.Split(u.Path, "/")...)...)
 	log.
 		WithField("path", path).
-		WithField("transport", u.SafeString()).
+		WithField("transport", SafeURLString(u)).
 		Debug("Opening file for transport")
 
 	f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY|os.O_CREATE|os.O_SYNC, 0664)
 	if err != nil {
 		log.
 			WithField("path", path).
-			WithField("transport", u.SafeString()).
+			WithField("transport", SafeURLString(u)).
 			WithError(err).
 			Debug("Failed to open file for transport")
 		return nil, err
@@ -39,7 +40,7 @@ func NewFileTransport(u *TransportURL) (*FileTransport, error) {
 
 	log.
 		WithField("path", path).
-		WithField("transport", u.SafeString()).
+		WithField("transport", SafeURLString(u)).
 		Debug("Transport ready")
 	return &FileTransport{
 		f:   f,
@@ -48,7 +49,7 @@ func NewFileTransport(u *TransportURL) (*FileTransport, error) {
 }
 
 func (t *FileTransport) Describe() string {
-	return t.url.SafeString()
+	return SafeURLString(t.url)
 }
 
 func (t *FileTransport) Subscribe(topic string) (Subscription, error) {

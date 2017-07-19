@@ -1,6 +1,7 @@
 package transports
 
 import (
+	"net/url"
 	"testing"
 	"time"
 
@@ -9,7 +10,7 @@ import (
 
 func TestNATSTransport(test *testing.T) {
 	Convey("NATSTransport", test, func() {
-		u, err := ParseURL("nats://localhost:4222/heimdall")
+		u, err := url.Parse("nats://localhost:4222/heimdall")
 		So(err, ShouldBeNil)
 		So(u, ShouldNotBeNil)
 

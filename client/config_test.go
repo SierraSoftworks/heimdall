@@ -20,7 +20,7 @@ func TestConfig(t *testing.T) {
 
 		So(c.Transports, ShouldHaveLength, 1)
 		So(c.Transports[0].Driver, ShouldEqual, "nats")
-		So(c.Transports[0].URL, ShouldEqual, "nats://localhost:4222")
+		So(c.Transports[0].URL.String(), ShouldEqual, "nats://localhost:4222")
 
 		So(c.Checks, ShouldHaveLength, 2)
 	})

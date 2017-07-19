@@ -2,6 +2,7 @@ package transports
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/nats-io/go-nats"
 )
@@ -9,18 +10,18 @@ import (
 type NATSTransport struct {
 	QueueGroup string
 
-	url *TransportURL
+	url *url.URL
 	c   *nats.Conn
 }
 
-func NewNATSTransport(u *TransportURL) (*NATSTransport, error) {
+func NewNATSTransport(u *url.URL) (*NATSTransport, error) {
 	c, err := nats.Connect(u.String())
 	if err != nil {
 		return nil, err
 	}
 
 	return &NATSTransport{
-		QueueGroup: u.GetOption("queue_group", "heimdall_servers"),
+		QueueGroup: GetURLOption(u, "queue_group", "heimdall_servers"),
 
 		c:   c,
 		url: u,
@@ -28,7 +29,7 @@ func NewNATSTransport(u *TransportURL) (*NATSTransport, error) {
 }
 
 func (t *NATSTransport) Describe() string {
-	return t.url.SafeString()
+	return SafeURLString(t.url)
 }
 
 func (t *NATSTransport) Subscribe(topic string) (Subscription, error) {
@@ -37,7 +38,7 @@ func (t *NATSTransport) Subscribe(topic string) (Subscription, error) {
 	}
 
 	c := make(chan []byte)
-	s, err := t.c.QueueSubscribe(t.url.GetFullTopic(topic), t.QueueGroup, func(m *nats.Msg) {
+	s, err := t.c.QueueSubscribe(GetFullTopic(t.url, topic), t.QueueGroup, func(m *nats.Msg) {
 		c <- m.Data
 	})
 
@@ -56,7 +57,7 @@ func (t *NATSTransport) Publish(topic string, data []byte) error {
 		return fmt.Errorf("not connected")
 	}
 
-	return t.c.Publish(t.url.GetFullTopic(topic), data)
+	return t.c.Publish(GetFullTopic(t.url, topic), data)
 }
 
 func (t *NATSTransport) Close() error {

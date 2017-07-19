@@ -1,6 +1,9 @@
 package transports
 
-import "fmt"
+import (
+	"fmt"
+	"net/url"
+)
 
 type Transport interface {
 	Describe() string
@@ -14,12 +17,7 @@ type Subscription interface {
 	Close() error
 }
 
-func GetTransport(driver string, url string) (Transport, error) {
-	u, err := ParseURL(url)
-	if err != nil {
-		return nil, err
-	}
-
+func GetTransport(driver string, u *url.URL) (Transport, error) {
 	switch driver {
 	case "nats":
 		return NewNATSTransport(u)
