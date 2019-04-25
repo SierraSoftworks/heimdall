@@ -1,0 +1,9 @@
+api:
+  listen: ":8080"
+
+keepalive:
+  interval: 30s
+
+stores:
+  - id: in-memory
+    type: memory

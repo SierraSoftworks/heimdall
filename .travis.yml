@@ -1,0 +1,15 @@
+language: go
+
+services:
+    - redis-server
+
+before_install:
+    - wget https://github.com/nats-io/gnatsd/releases/download/v0.9.6/gnatsd-v0.9.6-linux-amd64.zip
+    - unzip gnatsd-v0.9.6-linux-amd64.zip
+    - mv gnatsd-v0.9.6-linux-amd64 nats
+    - chmod +x nats/gnatsd
+
+before_script:
+    - nats/gnatsd &
+
+script: go test -v ./...

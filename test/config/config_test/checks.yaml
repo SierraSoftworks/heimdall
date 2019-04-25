@@ -1,0 +1,9 @@
+---
+checks:
+  - name: ping
+    command: echo "Ping"
+    interval: 30s
+
+  - name: pong
+    command: echo "Pong"
+    interval: 30s

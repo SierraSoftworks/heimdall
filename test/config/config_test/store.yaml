@@ -1,0 +1,4 @@
+---
+store:
+  type: memory
+  url: memory://namespace 

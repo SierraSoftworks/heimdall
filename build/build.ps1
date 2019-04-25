@@ -1,0 +1,1 @@
+go build -o bin/heimdall github.com/SierraSoftworks/heimdall/cmd/heimdall

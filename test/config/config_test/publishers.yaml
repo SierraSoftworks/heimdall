@@ -1,0 +1,4 @@
+---
+publishers:
+  - type: redis
+    url: redis://localhost:6379
