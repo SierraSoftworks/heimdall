@@ -1,0 +1,6 @@
+---
+checks:
+    - name: check2
+      command: echo "World"
+      interval: 60s
+      timeout: 2s

@@ -1,0 +1,5 @@
+---
+client:
+    name: $hostname
+    tags:
+        example: "yes"

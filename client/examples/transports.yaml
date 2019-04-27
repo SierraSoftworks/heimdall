@@ -1,0 +1,8 @@
+---
+transports:
+#   - driver: file
+#     url: file://temp.dat
+  - driver: nats
+    url: nats://localhost:4222
+#   - driver: redis
+#     url: redis://localhost:6379

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 workspace:
     base: /go
     path: src/github.com/SierraSoftworks/heimdall
@@ -42,4 +43,50 @@ pipeline:
     #     image: golang:1.8
     #     commands:
     #         - cd client
+=======
+workspace:
+    base: /go
+    path: src/github.com/SierraSoftworks/heimdall
+
+services:
+    nats:
+        image: nats:latest
+    redis:
+        image: redis:3.2-alpine
+
+pipeline:
+
+    go:deps:
+        image: golang:1.8
+        commands:
+            - go get -t ./...
+
+    go:test:
+        image: golang:1.8
+        commands:
+            - go test -v ./...
+
+    # go:build:server:linux:
+    #     image: golang:1.8
+    #     commands:
+    #         - cd server
+    #         - "CGO_ENABLED=0 GOOS=linux go build -o bin/heimdall-server -a -installsuffix cgo -ldflags '-s -X heimdall.version=${DRONE_TAG=v1.0.0}-${DRONE_BRANCH}.${DRONE_COMMIT:0:6} -X main.sentry_dsn=${SENTRY_DSN}'"
+
+    # go:build:client:linux:
+    #     image: golang:1.8
+    #     commands:
+    #         - cd client
+    #         - "CGO_ENABLED=0 GOOS=linux go build -o bin/heimdall-client -a -installsuffix cgo -ldflags '-s -X heimdall.version=${DRONE_TAG=v1.0.0}-${DRONE_BRANCH}.${DRONE_COMMIT:0:6} -X main.sentry_dsn=${SENTRY_DSN}'"
+
+    # go:build:server:windows:
+    #     image: golang:1.8
+    #     commands:
+    #         - cd server
+    #         - "GOOS=windows go build -o bin/heimdall-server.exe -a -ldflags '-s -X heimdall.version=${DRONE_TAG=v1.0.0}-${DRONE_BRANCH}.${DRONE_COMMIT:0:6} -X main.sentry_dsn=${SENTRY_DSN}'"
+
+    # go:build:client:windows:
+    #     image: golang:1.8
+    #     commands:
+    #         - cd client
+>>>>>>> master
     #         - "GOOS=windows go build -o bin/heimdall-client.exe -a -ldflags '-s -X heimdall.version=${DRONE_TAG=v1.0.0}-${DRONE_BRANCH}.${DRONE_COMMIT:0:6} -X main.sentry_dsn=${SENTRY_DSN}'"
