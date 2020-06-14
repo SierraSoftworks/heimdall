@@ -28,5 +28,5 @@ before_install:
 before_script:
     - nats/gnatsd &
 
->>>>>>> master
+>>>>>>> main
 script: go test -v ./...
